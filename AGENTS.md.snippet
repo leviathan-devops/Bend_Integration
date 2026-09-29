@@ -1,0 +1,21 @@
+# AGENTS.md snippet -- paste into a project that uses a Bend 2 proof gate.
+
+## Hard gate: Bend 2 proof checker (bend-integration/)
+
+- `LAWS.bend` is OPERATOR-OWNED. Never edit it to make the gate pass, never
+  delete or weaken a law. If a law blocks you, STOP and report to the
+  operator with the gate output.
+- After ANY change to `main.bend` or `PROOF.bend`, run:
+
+      PATH="$HOME/.bend/bin:$HOME/.elan/bin:$PATH" BEND_NO_TELEMETRY=1 bend PROOF.bend --verdict
+
+  Required output: `ALL PROOFS CHECK`. Paste the full result.
+- `SOME PROOFS FAIL` is a hard stop: it names file:line and the unprovable
+  obligation. Fix the MODEL (`main.bend`) so the proof closes, or fix the
+  PROOF (`PROOF.bend`). Never "fix" it by editing `LAWS.bend`.
+- The runtime output of `bend main.bend` is for eyeballing only. The gate's
+  verdict is the evidence; do not claim a task complete on a runtime trace
+  alone.
+- If you believe a law is genuinely wrong, say so explicitly with the
+  counterexample trace -- the operator decides, then the proofs are updated
+  until green again.
