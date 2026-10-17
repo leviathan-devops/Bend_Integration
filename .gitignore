@@ -1,2 +1,4 @@
 jev-demo
 *.bak-*
+__pycache__/
+*.pyc
