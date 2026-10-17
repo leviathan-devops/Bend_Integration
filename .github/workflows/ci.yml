@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      BEND_NO_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install clang
+        run: sudo apt-get update && sudo apt-get install -y clang
+
+      - name: Install Bend 2.0.32
+        run: sh scripts/install-bend.sh
+
+      - name: Install Lean v4.34.0
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o /tmp/elan-init.sh
+          sh /tmp/elan-init.sh -y --default-toolchain leanprover/lean4:v4.34.0
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Proof gate, runtime, and native build
+        run: sh run_demo.sh
+
+      - name: Negative control
+        run: sh mutation-check/check.sh
+
+      - name: Port guard
+        run: python3 -m unittest tests.test_port_guard -v
+
+      - name: History secret scan
+        run: sh scripts/history-scan.sh
